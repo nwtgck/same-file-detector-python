@@ -1,7 +1,7 @@
 import argparse
-import csv
 import hashlib
 import pathlib
+from collections import defaultdict
 
 class ProgressPrinter():
   def __init__(self):
@@ -37,18 +37,31 @@ if __name__ == "__main__":
   target_dir_path = args['target-directory']
 
   progress = ProgressPrinter()
+  file_size_to_path = defaultdict(lambda: [])
 
-  with open(out_csv_path, 'w', newline='') as csvfile:
-    w = csv.writer(csvfile)
+  for path in pathlib.Path(target_dir_path).rglob("*"):
+    if not path.is_file():
+      continue
+    file_path = str(path)
+    file_size = path.stat().st_size
+    file_size_to_path[file_size].append(file_path)
 
-    for path in pathlib.Path(target_dir_path).rglob("*"):
-      if not path.is_file():
+    # Progress
+    progress.print(file_path + "\r")
+  print("")
+
+  # Iterate  
+  for file_size, paths in file_size_to_path.items():
+    if len(paths) == 1:
+      continue
+
+    # NOTE: group_by
+    hash_to_path = defaultdict(lambda: [])
+    for path in paths:
+      hash = file_sha1(path)
+      hash_to_path[hash].append(path)
+    for hash, paths in hash_to_path.items():
+      if len(paths) == 1:
         continue
-
-      file_path = str(path)
-      hash = file_sha1(file_path)
-      w.writerow([hash, file_path])
-
-      # Progress
-      progress.print(file_path + "\r")
-    print("")
+      # Print files which have the same hash
+      print(hash, paths)
