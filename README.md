@@ -1,4 +1,5 @@
-# same-file-detector
+# same-file-finder
+Find duplicate files by message digest (hash)
 
 ## Usage
 
