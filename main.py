@@ -28,12 +28,10 @@ def file_sha1(file_path, size=4096):
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
-  parser.add_argument("out-csv", type=str)
   parser.add_argument("target-directory", type=str)
   # (from: https://stackoverflow.com/a/16878364/2885946)
   args = vars(parser.parse_args())
 
-  out_csv_path = args['out-csv']
   target_dir_path = args['target-directory']
 
   progress = ProgressPrinter()
